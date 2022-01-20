@@ -1,0 +1,11 @@
+.idea
+.DS_Store
+
+.env
+
+build
+coverage
+docs
+node_modules
+package-lock.json
+logs

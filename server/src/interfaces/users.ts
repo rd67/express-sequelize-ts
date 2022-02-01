@@ -1,29 +1,40 @@
+export enum IUserType {
+  user = 1 << 0,
+
+  admin = 1 << 1,
+  subAdmin = 1 << 2,
+}
+
 export interface UserAttributes {
   id: number;
+
+  userType: number;
 
   name: string;
 
   email: string;
 
-  countryCode: string;
+  phoneCode: string;
   phone: string;
 
-  passport: string;
+  languageId: number;
 
   pin: string;
 
-  profilePic?: string | null;
-  coverPic?: string | null;
+  profilePic: string;
+  coverPic: string;
 
   dob: Date | null;
 
   description?: string | null;
-  tagline?: string | null;
 
-  isUserBlocked: boolean;
-  isSolverBlocked: boolean;
+  isBlocked: boolean;
 
   lastSeen: Date;
-  // password?: string | null;
-  // preferredName: string | null;
+
+  referalCode: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
 }

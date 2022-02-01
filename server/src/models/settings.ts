@@ -2,13 +2,15 @@ import { Model, DataTypes, Optional } from "sequelize";
 
 import database from "@utils/mysql";
 
-import { SettingAttributes, IAppVersioning } from "@interfaces/settings";
 import { DefaultAppVersioning } from "@constants/settings";
 
-// Some attributes are optional in `Setting.build` and `Setting.create` calls
-interface SettingCreationAttributes extends Optional<SettingAttributes, "id"> {}
+import { SettingAttributes, IAppVersioning } from "@interfaces/settings";
 
-class SettingModel
+// Some attributes are optional in `Setting.build` and `Setting.create` calls
+interface SettingCreationAttributes
+  extends Optional<SettingAttributes, "id" | "createdAt" | "updatedAt"> {}
+
+class SettingInstance
   extends Model<SettingAttributes, SettingCreationAttributes>
   implements SettingAttributes
 {
@@ -17,11 +19,11 @@ class SettingModel
   public versioning!: IAppVersioning;
 
   // timestamps!
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public createdAt!: Date;
+  public updatedAt!: Date;
 }
 
-const Setting = database.sequelize.define<SettingModel>(
+const Setting = database.sequelize.define<SettingInstance>(
   "settings",
   {
     id: {
@@ -34,8 +36,23 @@ const Setting = database.sequelize.define<SettingModel>(
       type: DataTypes.JSON,
       defaultValue: DefaultAppVersioning,
     },
+
+    createdAt: {
+      type: database.Sequelize.DATE,
+      allowNull: false,
+      defaultValue: database.Sequelize.fn("NOW"),
+    },
+    updatedAt: {
+      type: database.Sequelize.DATE,
+      allowNull: false,
+      defaultValue: database.Sequelize.fn("NOW"),
+    },
   },
-  {}
+  {
+    timestamps: true,
+
+    tableName: "settings",
+  }
 );
 
 export default Setting;

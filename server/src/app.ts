@@ -8,23 +8,32 @@ import hpp from "hpp";
 import requestIp from "request-ip";
 import UserAgent from "express-useragent";
 import chalk from "chalk";
-// import morgan from "morgan";
+import fileUpload from "express-fileupload";
+
 // import swaggerJSDoc from 'swagger-jsdoc';
 // import swaggerUi from 'swagger-ui-express';
-// import DB from '@databases';
 
 import {
   RequestHandler,
   LatencyHandler,
   RouteNotFoundHandler,
+  ErrorHandler,
   ReqRateLimiterHandler,
 } from "@middlewares/index";
 import i18n from "@utils/i18n";
+import httpLogger from "@utils/httpLogger";
 import mysql from "@utils/mysql";
 
 import config from "@config/config";
 
 import modules from "@modules/index";
+
+import { associateModels } from "@models/index";
+
+import queues from "@queues/index";
+
+import { bootstrapApp } from "./bootstrap";
+import socket from "@utils/socket";
 
 const {
   app: { port, environment },
@@ -44,7 +53,6 @@ class App {
     this.initializeMiddlewares();
     this.initializeRoutes();
     // this.initializeSwagger();
-    this.initializeErrorHandling();
   }
 
   public listen() {
@@ -79,29 +87,36 @@ class App {
     };
 
     // Run listener
-    this.app
+    const server = this.app
       .listen(this.port)
       .on("error", onError)
       .on("listening", onListening);
-  }
 
-  public getServer() {
-    return this.app;
+    socket(server);
   }
 
   private connectToDatabase = async () => {
     await mysql.sequelize.sync({ force: false });
+    // .then(function () {
+    //   return mysql.sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
+    // });
+
+    associateModels();
+
+    await bootstrapApp();
   };
 
   private initializeMiddlewares() {
     i18n(this.app);
 
-    // this.app.use(morgan(config.get('log.format'), { stream }));
+    httpLogger(this.app); //  Console log info regarding requests
+
     // this.app.use(cors({ origin: config.get('cors.origin'), credentials: config.get('cors.credentials') }));
     this.app.use(
-      cors({
-        origin: ["*"],
-      })
+      cors()
+      // cors({
+      //   origin: ["*"],
+      // })
     );
 
     this.app.use(hpp());
@@ -109,11 +124,22 @@ class App {
     this.app.use(compression());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(
+      fileUpload({
+        limits: { fileSize: 50 * 1024 * 1024 },
+      })
+    );
     this.app.use(cookieParser());
 
     this.app.use(express.static(path.resolve(`${__dirname}/../public`)));
     this.app.use(requestIp.mw());
     this.app.use(UserAgent.express());
+
+    // View Engine Setup
+    // this.app.set('views', path.join(__dirname))
+    // this.app.set('view engine', 'hbs')
+    this.app.set("views", path.resolve(`${__dirname}/../views`));
+    this.app.set("view engine", "hbs");
 
     this.app.use(RequestHandler);
     this.app.use(ReqRateLimiterHandler);
@@ -125,6 +151,9 @@ class App {
 
     // Catch error 404 endpoint not found
     this.app.use("*", RouteNotFoundHandler);
+
+    // Catch errors
+    this.app.use(ErrorHandler);
   }
 
   // private initializeSwagger() {
@@ -142,10 +171,6 @@ class App {
   //   const specs = swaggerJSDoc(options);
   //   this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
   // }
-
-  private initializeErrorHandling() {
-    this.app.use(RouteNotFoundHandler);
-  }
 }
 
 export default App;

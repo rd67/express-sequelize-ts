@@ -7,11 +7,27 @@ dotenv.config();
 const env = (process.env.NODE_ENV ||
   "development") as interfaces.IEnvEnvironment;
 
+const port = Number(process.env.PORT || "3333");
+
+const uploadUtil = (process.env.UPLOAD_UTIL ||
+  "local") as interfaces.IUploadUtilType;
+const emailUtil = (process.env.EMAIL_UTIL ||
+  "ses") as interfaces.IEmailUtilType;
+
+export const baseURL = process.env.BASE_URL as string;
+
+export const panelURL = process.env.PANEL_URL as string;
+export const defaultPassword =
+  process.env.DEFAULT_ADMIN_PASSWORD || "Core2Duo@1";
+
+const logo = `${baseURL}/logos/logo.png`;
+const logoMini = `${baseURL}/logos/logoMini.png`;
+
 export const otherConfig: interfaces.IOtherConfig = {
   fakeLatency: Number(process.env.FAKE_LATENCY ?? "0"),
 };
 
-const redisConfig: interfaces.IRedisConfig = {
+export const redisConfig: interfaces.IRedisConfig = {
   url: process.env.REDIS_URL as string,
   rateLimit: Number(process.env.RATE_LIMIT ?? "50"),
 };
@@ -28,6 +44,12 @@ export const emailConfig: interfaces.IEmailConfig = {
   fromEmail: process.env.EMAIL_FROM as string,
 };
 
+export const smsConfig: interfaces.ISMSConfig = {
+  provider: "onewaysms",
+  username: process.env.ONEWAY_USERNAME || "",
+  password: process.env.ONEWAY_PASSWORD || "",
+};
+
 export const dbConfig: interfaces.IDbConfig = {
   host: process.env.DB_HOST as string,
   username: process.env.DB_USERNAME as string,
@@ -40,38 +62,70 @@ export const dbConfig: interfaces.IDbConfig = {
     max: 5,
   },
 };
-// export const uploadUtil = process.env.UPLOAD_UTIL || 'local';
-// export const emailUtil = process.env.EMAIL_UTIL || 'ses';
+
+export const panelConfig: interfaces.IPanelConfig = {
+  panelURL,
+  defaultPassword,
+};
 
 // //Note: this email needs to be verified for sending mail
 // export const fromEmail = process.env.FROM_EMAIL || 'no-reply@max360.com';
+
+const AppName = process.env.APP_NAME || "Boleh";
 
 const development: interfaces.IConfig = {
   app: {
     isProduction: false,
     environment: "development",
-    port: 3333,
+    name: AppName,
+    port,
     secretKey: process.env.SECRET_KEY as string,
+    baseURL,
+    logo,
+    logoMini,
   },
+
   other: otherConfig,
-  redis: redisConfig,
-  aws: awsConfig,
-  email: emailConfig,
+
   db: dbConfig,
+  redis: redisConfig,
+
+  aws: awsConfig,
+
+  email: emailConfig,
+  sms: smsConfig,
+
+  panel: panelConfig,
+
+  uploadUtil,
+  emailUtil,
 };
 
 const production: interfaces.IConfig = {
   app: {
     isProduction: true,
     environment: "production",
-    port: 3334,
+    name: AppName,
+    port,
     secretKey: process.env.SECRET_KEY as string,
+    baseURL,
+    logo,
+    logoMini,
   },
   other: otherConfig,
-  redis: redisConfig,
-  aws: awsConfig,
-  email: emailConfig,
+
   db: dbConfig,
+  redis: redisConfig,
+
+  aws: awsConfig,
+
+  email: emailConfig,
+  sms: smsConfig,
+
+  panel: panelConfig,
+
+  uploadUtil,
+  emailUtil,
 };
 
 const config: Record<interfaces.IEnvEnvironment, interfaces.IConfig> = {

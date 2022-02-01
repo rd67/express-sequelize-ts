@@ -5,8 +5,6 @@ import config from "@config/config";
 
 import { logger } from "@utils/logger";
 
-// import UserModel from "@models/users";
-
 const { host, username, password, database, dialect, pool } = config.db;
 
 const sequelize = new Sequelize.Sequelize(database, username, password, {
@@ -33,16 +31,15 @@ const sequelize = new Sequelize.Sequelize(database, username, password, {
 sequelize
   .authenticate()
   .then(() => {
-    const name = chalk.cyan("Mysql Client");
+    const name = chalk.cyan("🌿Mysql Client");
     console.log(`${name} Connection has been established successfully.`);
   })
   .catch((error) => {
     // logger.error()
-    console.log(`${chalk.red("Mysql Error:")} Something went wrong ${error}`);
+    console.log(`❌${chalk.red("Mysql Error:")} Something went wrong ${error}`);
   });
 
 const DB = {
-  // Users: UserModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
 };

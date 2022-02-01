@@ -14,6 +14,8 @@ const S3 = new S3Package({
 
 const { s3Bucket } = awsConfig;
 
+export const UploadFolder = "";
+
 export const uploadFile = async ({
   key,
   body,

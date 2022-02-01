@@ -1,31 +1,33 @@
-import fs, { promises as fsPromise } from 'fs';
-import * as http from 'http';
-import * as https from 'https';
-import * as util from 'util';
+import fs, { promises as fsPromise } from "fs";
+import * as http from "http";
+import * as https from "https";
+import * as util from "util";
 
-import { logInfo } from '../../common';
-import { appURL, baseURL } from '../../config';
+import config from "@config/config";
 
-import * as interfaces from './interfaces';
+import { logger } from "@utils/logger";
 
-const OuterFolderName = 'public';
-export const UploadFolder = 'uploads';
+import * as interfaces from "./interfaces";
+
+const OuterFolderName = "public";
+
+export const UploadFolder = "uploads";
 
 export const uploadFile = async ({ key, body }: interfaces.Upload) => {
   let { folder, fileName } = await makeDir(key);
 
-  await fsPromise.writeFile(`${folder}/${fileName}`, body, 'binary');
+  await fsPromise.writeFile(`${folder}/${fileName}`, body, "binary");
 
   return key;
 };
 
 export const deleteFile = async ({ key }: interfaces.Key) => {
-  let keyArray = key.split('/');
+  let keyArray = key.split("/");
   if (keyArray[0] !== OuterFolderName) {
     key = `${OuterFolderName}/${key}`;
   }
 
-  logInfo(`Unlinking ${key}`);
+  logger.info(`Unlinking ${key}`);
 
   await fsPromise.unlink(key);
 
@@ -37,7 +39,7 @@ export const downloadFile = async ({ key, dest }: interfaces.Download) => {
 
   const fsStream = fs.createWriteStream(dest);
 
-  const proto = !key.charAt(4).localeCompare('s') ? https : http;
+  const proto = !key.charAt(4).localeCompare("s") ? https : http;
 
   return new Promise((resolve, reject) => {
     const request = proto.get(key, (response) => {
@@ -51,11 +53,11 @@ export const downloadFile = async ({ key, dest }: interfaces.Download) => {
     });
 
     // The destination stream is ended by the time it's called
-    fsStream.on('finish', () => resolve(key));
-    request.on('error', (err) => {
+    fsStream.on("finish", () => resolve(key));
+    request.on("error", (err) => {
       fs.unlink(dest, () => reject(err));
     });
-    fsStream.on('error', (err) => {
+    fsStream.on("error", (err) => {
       fs.unlink(dest, () => reject(err));
     });
 
@@ -64,11 +66,11 @@ export const downloadFile = async ({ key, dest }: interfaces.Download) => {
 };
 
 export const signedURL = (key: string) => {
-  return `${baseURL}/${key}`;
+  return `${config.app.baseURL}/${key}`;
 };
 
 export const localBaseURL = () => {
-  return `${appURL}`;
+  return `${config.app.baseURL}/public/${UploadFolder}`;
 };
 
 export const copyFile = async (source: string, target: string) => {
@@ -81,11 +83,11 @@ export const copyFile = async (source: string, target: string) => {
 };
 
 export const makeDir = async (key: string) => {
-  let keyArray = key.split('/');
+  let keyArray = key.split("/");
   let fileName = keyArray[keyArray.length - 1];
   keyArray.splice(keyArray.length - 1);
 
-  let folder = keyArray.join('/');
+  let folder = keyArray.join("/");
 
   if (keyArray[0] !== OuterFolderName) {
     folder = `${OuterFolderName}/${folder}`;

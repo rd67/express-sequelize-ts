@@ -25,10 +25,6 @@ export const MESSAGES = {
   authTokenExpired: "Your auth token has expired, kindly login again",
   authTokenVerificationFailed:
     "Invalid auth token provided, kindly check it and try again",
-  missingUserTypeACL: "Missing required user type permission",
-  missingPermissionACL: "Missing required permission",
-  missingProductPermissionACL:
-    "Sorry, this product is not accessible to you, kindly contact the admin.",
 
   invalidJSON: "Invalid JSON provided",
   linkExpired: "Sorry, the following link has expired",
@@ -36,13 +32,14 @@ export const MESSAGES = {
   tooManyRequest:
     "You sent too many requests, Please wait for a while then try again",
 
-  missingAccountId: "Kindly provide accountId to access this resource",
-  missingAccountPerm:
-    "Sorry, you are not authoried to access resources on this account",
-  rejectedAccountInvitation:
-    "Sorry, you are have rejected the invite for this account, kindly contact the owner of this account",
-  blockedAccountAccess:
-    "Sorry, you are blocked to access resources on this account, kindly contact the account admin",
+  missingPerm: "Sorry, you are not authorized, to access this resources.",
+
+  incorrectPin: "Kindly check your credentials, incorrect pin",
+
+  invalidOTP:
+    "The OTP you have entered is wrong. Please try again or request a new OTP",
+
+  phoneChangeSuccess: "Phone number changed successfully",
 };
 
 export const DEFAULT_PAGE_SIZE = 100;

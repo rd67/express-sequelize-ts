@@ -3,11 +3,19 @@ import { Dialect } from "sequelize";
 
 export type IEnvEnvironment = "production" | "development";
 
+export type IUploadUtilType = "s3" | "local";
+
+export type IEmailUtilType = "ses";
+
 interface IAppConfig {
   isProduction: boolean;
   environment: IEnvEnvironment;
+  name: string;
   port: number;
   secretKey: string;
+  baseURL: string;
+  logo: string;
+  logoMini: string;
 }
 
 export interface IOtherConfig {
@@ -31,6 +39,12 @@ export interface IEmailConfig {
   fromEmail: string;
 }
 
+export interface ISMSConfig {
+  provider: "sns" | "onewaysms";
+  username: string;
+  password: string;
+}
+
 export interface IDbConfig {
   host: string;
   database: string;
@@ -46,11 +60,27 @@ export interface IDbConfig {
   // force: boolean;
 }
 
+export interface IPanelConfig {
+  panelURL: string;
+  defaultPassword: string;
+}
+
 export interface IConfig {
   app: IAppConfig;
+
   other: IOtherConfig;
+
   db: IDbConfig;
   redis: IRedisConfig;
+
   aws: IAwsConfig;
+
   email: IEmailConfig;
+  sms: ISMSConfig;
+
+  panel: IPanelConfig;
+
+  uploadUtil: IUploadUtilType;
+
+  emailUtil: IEmailUtilType;
 }

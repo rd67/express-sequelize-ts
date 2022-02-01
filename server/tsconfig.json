@@ -24,7 +24,9 @@
       "@middlewares/*": ["middlewares/*"],
       "@models/*": ["models/*"],
       "@interfaces/*": ["interfaces/*"],
-      "@modules/*": ["modules/*"]
+      "@modules/*": ["modules/*"],
+      "@queues/*": ["queues/*"],
+      "@views/*": ["views/*"]
     } /* Allow multiple folders to be treated as one when resolving modules. */,
     "typeRoots": ["./src/types", "./src/**/interfaces.ts"]
   },

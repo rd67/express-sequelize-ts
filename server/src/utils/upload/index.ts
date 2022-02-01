@@ -1,30 +1,36 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
-import { nodeEnv, uploadUtil } from '../../config';
-import { IUploadedFile } from '../../interfaces';
+import config from "@config/config";
 
-import * as s3 from './s3';
-import * as local from './local';
+import { IUploadedFile } from "@interfaces/common";
 
-const isS3Enabled = uploadUtil === 's3';
+import * as s3 from "./s3";
+import * as local from "./local";
+
+const isS3Enabled = config.uploadUtil === "s3";
 
 export const keyGenerator = (
   prefix: string,
   mimetype: string,
-  file_prefix = ''
+  file_prefix = ""
 ) => {
-  let key = crypto.randomBytes(16).toString('hex');
+  let key = crypto.randomBytes(16).toString("hex");
 
   if (file_prefix) {
     key = `${file_prefix}_${key}`;
   }
 
-  const extArr = mimetype.split('/');
+  const extArr = mimetype.split("/");
   const extension = extArr[extArr.length - 1];
+
+  let result = `${config.app.environment}/${prefix}/${key}.${extension}`;
+  if (UploadFolder) {
+    result = `${UploadFolder}/${result}`;
+  }
 
   return {
     extension,
-    key: `${UploadFolder}/${nodeEnv}/${prefix}/${key}.${extension}`,
+    key: result,
   };
 };
 

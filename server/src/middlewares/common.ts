@@ -16,6 +16,9 @@ export const RequestHandler = (
   //@ts-ignore
   req["reqId"] = uuidGenerate();
 
+  //  Setting Language incase a header come
+  res.setLocale(req.get("languageCode") || "en");
+
   next();
 };
 
@@ -52,3 +55,12 @@ export const RouteNotFoundHandler = (
 export const AsyncHandler =
   (fn: any) => (req: Request, res: Response, next: NextFunction) =>
     Promise.resolve(fn(req, res, next)).catch(next);
+
+export const ErrorHandler = (
+  error: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  return errorResponse(error, req, res);
+};

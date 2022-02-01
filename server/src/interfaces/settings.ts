@@ -13,4 +13,7 @@ export interface SettingAttributes {
   id: number;
 
   versioning: IAppVersioning;
+
+  createdAt: Date;
+  updatedAt: Date;
 }

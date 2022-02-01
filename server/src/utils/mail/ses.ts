@@ -1,7 +1,10 @@
-import SESPackage from "aws-sdk/clients/ses";
+import SESPackage, { SendEmailRequest } from "aws-sdk/clients/ses";
 
 import { awsConfig, emailConfig } from "@config/config";
-// import { logError } from '../../common';
+
+import { logger } from "@utils/logger";
+
+import { logInfo } from "@helpers/common";
 
 import * as interfaces from "./interfaces";
 
@@ -21,7 +24,7 @@ export const sendEmail = (
   }: interfaces.ISendEmailParams,
   mergeVariables: any = {}
 ) => {
-  const params = {
+  const params: SendEmailRequest = {
     Destination: {
       ToAddresses: [to],
     },
@@ -58,11 +61,13 @@ export const sendEmail = (
         data,
         link: mergeVariables?.["link"],
       };
-      console.log("Email submitted to SES", result);
+
+      logInfo({
+        msg: "Email submitted to SES",
+        result,
+      });
+
       return result;
     })
-    .catch((error) => {
-      // logError(error);
-      return false;
-    });
+    .catch(logger.error);
 };

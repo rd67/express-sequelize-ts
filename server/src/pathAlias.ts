@@ -11,4 +11,6 @@ ModuleAlias.addAliases({
   "@models": `${__dirname}/models`,
   "@interfaces": `${__dirname}/interfaces`,
   "@modules": `${__dirname}/modules`,
+  "@queues": `${__dirname}/queues`,
+  "@views": `${__dirname}/views`,
 });

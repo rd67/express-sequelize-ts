@@ -5,26 +5,29 @@ networks:
     driver: bridge
 
 volumes:
-  tsBoilerPlateRedisData:
-    name: tsBoilerPlateRedisData
-  tsBoilerPlateMySQLData:
-    name: tsBoilerPlateMySQLData
+  estRedisVolume:
+    name: estRedisVolume
+  estMySQLVolume:
+    name: estMySQLVolume
+  estElasticSearchVolume:
+    name: estElasticSearchVolume
 
 services:
   redis:
+    container_name: estRedis
     image: redis:6.2.1-alpine
     ports:
       - "6380:6379"
     volumes:
-      - tsBoilerPlateRedisData:/data
+      - estRedisVolume:/data
     networks:
       - ebm
 
   mySQL:
-    container_name: mySQL
+    container_name: estMySQL
     image: mysql:8.0
     volumes:
-      - tsBoilerPlateMySQLData:/var/lib/mysql
+      - estMySQLVolume:/var/lib/mysql
       - "./Docker/mySQL/my.cnf:/etc/mysql/conf.d/my.cnf"
     command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
@@ -39,8 +42,8 @@ services:
       - ebm
 
   phpmyadmin:
+    container_name: estPhpmyadmin
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
     links:
       - mySQL
     environment:
@@ -49,21 +52,35 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - 8081:80
+      - 9001:80
     networks:
       - ebm
   # adminer:
   #   container_name: adminer
   #   image: adminer
   #   depends_on:
-  #     - mySQL
+  #     - estMySQL
   #   environment:
-  #     ADMINER_DEFAULT_DB_DRIVER: mySQL
-  #     ADMINER_DEFAULT_DB_HOST: mySQL
+  #     ADMINER_DEFAULT_DB_DRIVER: estMySQL
+  #     ADMINER_DEFAULT_DB_HOST: estMySQL
   #     ADMINER_DEFAULT_DB_NAME: adminer
   #     ADMINER_DESIGN: nette
   #     ADMINER_PLUGINS: tables-filter tinymce
   #   ports:
-  #     - 8080:8080
+  #     - 9002:8080
   #   networks:
   #     - ebm
+
+  #https://www.elastic.co/guide/en/elasticsearch/reference/7.5/docker.html
+  elasticsearch:
+    container_name: estElasticSearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.1
+    environment:
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    volumes:
+      - estElasticSearchVolume:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - ebm
